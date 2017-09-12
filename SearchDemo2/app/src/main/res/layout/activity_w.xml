@@ -1,0 +1,121 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.design.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/kkkkkkkkkk"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#ffffff"
+    android:fitsSystemWindows="true">
+
+    <android.support.design.widget.AppBarLayout
+        android:id="@+id/appbarlayout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="#ffffff">
+
+        <android.support.design.widget.CollapsingToolbarLayout
+
+            app:contentScrim="#fd9941"
+            android:background="#fd9941"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+
+            >
+
+            <LinearLayout
+                android:padding="4dp"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:orientation="horizontal">
+
+                <LinearLayout
+                    android:padding="5dp"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center_vertical"
+                    android:layout_weight="1"
+                    android:background="@drawable/button_corner_sharp_5"
+                    android:gravity="center_vertical"
+                    android:orientation="horizontal">
+
+
+                    <ImageView
+                        android:layout_margin="2dp"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="center_vertical"
+                        android:src="@drawable/search" />
+
+                    <com.example.mac.searchdemo.EditText_Clear
+                        android:id="@+id/et_search1"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:layout_gravity="center_vertical"
+                        android:background="#ffffff"
+                        android:gravity="center_vertical"
+                        android:hint="搜索产品名称"
+                        android:maxLines="1"
+                        android:textColor="#333333" />
+
+
+                </LinearLayout>
+
+                <TextView
+                    android:layout_marginLeft="4dp"
+                    android:id="@+id/cancel"
+                    android:layout_width="wrap_content"
+                    android:layout_height="match_parent"
+                    android:layout_marginRight="30px"
+                    android:gravity="center"
+                    android:text="取消"
+                    android:textColor="#ffffff" />
+
+            </LinearLayout>
+
+        </android.support.design.widget.CollapsingToolbarLayout>
+
+        <RadioGroup
+            android:id="@+id/sliding_tabs1"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:background="#ffffff"
+            android:orientation="horizontal"
+            android:visibility="gone">
+
+            <RadioButton
+                android:id="@+id/btn1"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:background="@drawable/draw_line"
+                android:button="@null"
+                android:gravity="center"
+                android:padding="10dp"
+                android:text="销量"
+                android:textColor="#333333" />
+
+
+            <RadioButton
+                android:id="@+id/btn2"
+                android:layout_width="0px"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:button="@null"
+                android:drawableRight="@drawable/up"
+                android:gravity="center"
+                android:padding="10dp"
+                android:text="金额"
+                android:textColor="#333333" />
+        </RadioGroup>
+    </android.support.design.widget.AppBarLayout>
+
+
+    <FrameLayout
+
+        android:id="@+id/frame"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        app:layout_behavior="@string/appbar_scrolling_view_behavior"></FrameLayout>
+
+
+</android.support.design.widget.CoordinatorLayout>
