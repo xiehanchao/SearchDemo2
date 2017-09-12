@@ -1,4 +1,4 @@
-package com.example.mac.searchdemo;
+package com.example.mac.searchdemo.fragment;
 
 import android.content.Context;
 import android.content.SharedPreferences;
@@ -16,6 +16,7 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.example.mac.searchdemo.R;
 import com.zhy.view.flowlayout.FlowLayout;
 import com.zhy.view.flowlayout.TagAdapter;
 import com.zhy.view.flowlayout.TagFlowLayout;
@@ -116,5 +117,4 @@ public class SearchHistory extends Fragment {
         super.onResume();
     }
 
-//    public List<String> getList
 }

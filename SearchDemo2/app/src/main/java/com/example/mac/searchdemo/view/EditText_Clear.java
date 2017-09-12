@@ -1,10 +1,12 @@
-package com.example.mac.searchdemo;
+package com.example.mac.searchdemo.view;
 
 import android.content.Context;
 import android.graphics.Rect;
 import android.graphics.drawable.Drawable;
 import android.util.AttributeSet;
 import android.view.MotionEvent;
+
+import com.example.mac.searchdemo.R;
 
 /**
  * Created by Carson_Ho on 17/8/10.

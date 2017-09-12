@@ -1,6 +1,5 @@
-package com.example.mac.searchdemo;
+package com.example.mac.searchdemo.fragment;
 
-import android.graphics.Typeface;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.support.annotation.IdRes;
@@ -18,7 +17,10 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.RadioButton;
 import android.widget.RadioGroup;
-import android.widget.TextView;
+
+import com.example.mac.searchdemo.R;
+import com.example.mac.searchdemo.activity.MainSearch;
+import com.example.mac.searchdemo.view.EditText_Clear;
 
 
 /**
@@ -28,7 +30,7 @@ import android.widget.TextView;
 public class MainSearchFragment extends Fragment {
 
     private FragmentTransaction fragmentTransaction;
-    private FragmentManager supportFragmentManager;
+    private FragmentManager fragmentManager;
     private BottomOneFragment test1F;
     private BottomTwoFragment test2F;
     private RadioButton btn1;
@@ -37,28 +39,23 @@ public class MainSearchFragment extends Fragment {
     private Drawable down;
     private Drawable up;
     String text;
-    private String history;
+    private String histoyry;
     private EditText_Clear editText_clear;
     private boolean isCheck = false;
 
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, Bundle savedInstanceState) {
-
         View view = inflater.inflate(R.layout.activity_w, container, false);
-
         return view;
     }
 
     @Override
     public void onViewCreated(final View view, @Nullable final Bundle savedInstanceState) {
-
-
         final RadioGroup tab = (RadioGroup) view.findViewById(R.id.sliding_tabs1);
-//        final TextView cancel = (TextView) view.findViewById(R.id.cancel);
         SearchHistory searchH = new SearchHistory();
         final MainSearch mainActivity = (MainSearch) getActivity();
-        supportFragmentManager = mainActivity.getSupportFragmentManager();
+        fragmentManager = getChildFragmentManager();
         if (android.os.Build.VERSION.SDK_INT >= 21) {
             down = getResources().getDrawable(R.drawable.down, getContext().getTheme());
             up = getResources().getDrawable(R.drawable.up, getContext().getTheme());
@@ -66,8 +63,7 @@ public class MainSearchFragment extends Fragment {
             down = getResources().getDrawable(R.drawable.down);
             up = getResources().getDrawable(R.drawable.up);
         }
-
-        fragmentTransaction = supportFragmentManager.beginTransaction();
+        fragmentTransaction = fragmentManager.beginTransaction();
         fragmentTransaction.replace(R.id.frame, searchH);
         fragmentTransaction.commit();
         btn1 = (RadioButton) view.findViewById(R.id.btn1);
@@ -76,13 +72,7 @@ public class MainSearchFragment extends Fragment {
         btn2.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-
                 test2F = BottomTwoFragment.getInstance();
-
-                System.out.println("MainSearchFragment.onClick=====" + price_sort);
-                FragmentManager supportFragmentManager = getActivity().getSupportFragmentManager();
-                Fragment findFragment = supportFragmentManager.findFragmentById(R.id.frame);
-
                 if (isCheck) {
                     price_sort = 1;
                     up.setBounds(0, 0, up.getMinimumWidth(), up.getMinimumHeight());
@@ -91,7 +81,6 @@ public class MainSearchFragment extends Fragment {
                     isCheck = false;
                     return;
                 }
-
                 if (price_sort == 1) {
                     price_sort = 2;
                     down.setBounds(0, 0, down.getMinimumWidth(), down.getMinimumHeight());
@@ -120,10 +109,8 @@ public class MainSearchFragment extends Fragment {
 
             @Override
             public void afterTextChanged(Editable s) {
-
                 text = editText_clear.getText().toString().trim();
                 if (TextUtils.isEmpty(text)) {
-
                     AppBarLayout appbarlayout = (AppBarLayout) view.findViewById(R.id.appbarlayout);
                     CollapsingToolbarLayout collapsingToolbarLayout = (CollapsingToolbarLayout) appbarlayout.getChildAt(0);
                     AppBarLayout.LayoutParams mParams = (AppBarLayout.LayoutParams) collapsingToolbarLayout.getLayoutParams();
@@ -165,12 +152,9 @@ public class MainSearchFragment extends Fragment {
                         }
                         test2F.setInputString(1, text);
                     }
-
-
                     tab.setVisibility(View.VISIBLE);
                     mainActivity.jumpFragment(false, text);
                 }
-                queryData(text);
             }
         });
 
@@ -178,7 +162,7 @@ public class MainSearchFragment extends Fragment {
         tab.setOnCheckedChangeListener(new RadioGroup.OnCheckedChangeListener() {
             @Override
             public void onCheckedChanged(RadioGroup group, @IdRes int checkedId) {
-                FragmentTransaction fragmentTransaction = supportFragmentManager.beginTransaction();
+                FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
                 text = editText_clear.getText().toString().trim();
                 if (checkedId == btn1.getId()) {
 
@@ -186,25 +170,10 @@ public class MainSearchFragment extends Fragment {
                     btn1.setBackgroundResource(R.drawable.draw_line);
                     btn2.setBackgroundResource(R.drawable.white_back);
 
-                    if (test1F != null) {
-                        if (test1F.isHidden()) {
-                            fragmentTransaction.show(test1F);
-                            if (test2F != null) {
-                                fragmentTransaction.hide(test2F);
-                            }
-                        } else {
-
-                            fragmentTransaction.replace(R.id.frame, test1F);
-                        }
-                    } else {
+                    if (test1F == null) {
                         test1F = BottomOneFragment.getInstance();
-                        fragmentTransaction.add(R.id.frame, test1F);
-                        fragmentTransaction.hide(test2F);
                     }
-                    if (test2F == null) {
-                        test2F = BottomTwoFragment.getInstance();
-
-                    }
+                    fragmentTransaction.replace(R.id.frame, test1F);
                     if (android.os.Build.VERSION.SDK_INT >= 21) {
                         up = getResources().getDrawable(R.drawable.up, getContext().getTheme());
                     } else {
@@ -215,23 +184,11 @@ public class MainSearchFragment extends Fragment {
 
                     btn2.setBackgroundResource(R.drawable.draw_line);
                     btn1.setBackgroundResource(R.drawable.white_back);
-                    if (test2F != null) {
-                        if (test2F.isHidden()) {
-                            fragmentTransaction.show(test2F);
-                            if (test1F != null) {
-                                fragmentTransaction.hide(test1F);
-                            }
-                        } else {
-                            fragmentTransaction.replace(R.id.frame, test2F);
-                        }
-                    } else {
+                    if (test2F == null) {
                         test2F = BottomTwoFragment.getInstance();
-                        fragmentTransaction.add(R.id.frame, test2F);
-                        fragmentTransaction.hide(test1F);
                     }
+                    fragmentTransaction.replace(R.id.frame, test2F);
                     isCheck = true;
-                    price_sort = 1;
-                    test2F.setInputString(1, text);
                 }
                 fragmentTransaction.commit();
             }
@@ -239,24 +196,17 @@ public class MainSearchFragment extends Fragment {
         });
 
     }
-
-    private void queryData(String text) {
-
-    }
-
     @Override
     public void onHiddenChanged(boolean hidden) {
         super.onHiddenChanged(hidden);
 
     }
-
     @Override
     public void onResume() {
         super.onResume();
     }
 
     public void setHistory(String history) {
-        System.out.println("MainSearchFragment.setHistory");
         editText_clear.setText(history);
     }
 }

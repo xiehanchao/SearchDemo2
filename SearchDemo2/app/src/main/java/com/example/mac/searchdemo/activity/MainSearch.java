@@ -1,10 +1,16 @@
-package com.example.mac.searchdemo;
+package com.example.mac.searchdemo.activity;
 
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+
+import com.example.mac.searchdemo.fragment.BottomOneFragment;
+import com.example.mac.searchdemo.fragment.BottomTwoFragment;
+import com.example.mac.searchdemo.fragment.MainSearchFragment;
+import com.example.mac.searchdemo.R;
+import com.example.mac.searchdemo.fragment.SearchHistory;
 
 public class MainSearch extends AppCompatActivity {
     private SearchHistory searchFragment;
@@ -46,10 +52,10 @@ public class MainSearch extends AppCompatActivity {
                 return;
             } else {
                 if (test1F != null) {
-                    fragmentTransaction.replace(R.id.frame, test1F, "yaoyan");
+                    fragmentTransaction.replace(R.id.frame, test1F);
                 } else {
                     test1F = BottomOneFragment.getInstance();
-                    fragmentTransaction.replace(R.id.frame, test1F, "yaoyan");
+                    fragmentTransaction.replace(R.id.frame, test1F);
                 }
 
             }

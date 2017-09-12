@@ -1,4 +1,4 @@
-package com.example.mac.searchdemo;
+package com.example.mac.searchdemo.fragment;
 
 import android.content.Context;
 import android.content.SharedPreferences;
@@ -16,6 +16,8 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import com.example.mac.searchdemo.R;
+import com.example.mac.searchdemo.activity.MainSearch;
 import com.example.mac.searchdemo.databinding.ContextText1Binding;
 import com.example.mac.searchdemo.databinding.XhcItemlayoutBinding;
 import com.jcodecraeer.xrecyclerview.ProgressStyle;
@@ -24,35 +26,29 @@ import com.jcodecraeer.xrecyclerview.XRecyclerView;
 import java.util.ArrayList;
 import java.util.List;
 
+
 /**
  * Created by Yaoyan on 2017/8/30.
  */
 
-public class BottomTwoFragment extends Fragment {
+public class BottomOneFragment extends Fragment {
     private static List<String> list = new ArrayList<String>();
-    private BottomTwoFragment.HomeAdapter mAdapter;
+    private static List<String> networkList = new ArrayList<String>();
+    private boolean isFirst = false;
+    private HomeAdapter mAdapter;
     private String inputString;
     private ContextText1Binding binding;
-    //升序 剪头向上
-    public int sort = 1;
     private int page = 1;
-    private XRecyclerView view;
+    private int pageCount = 1;
     //类加载时就初始化
-    private static final BottomTwoFragment instance = new BottomTwoFragment();
+    private static final BottomOneFragment instance = new BottomOneFragment();
+    private XRecyclerView view;
 
-    private BottomTwoFragment() {
+    private BottomOneFragment() {
 
     }
 
-    private Context context;
-
-    @Override
-    public void onAttach(Context context) {
-        this.context = context;
-        super.onAttach(context);
-    }
-
-    public static BottomTwoFragment getInstance() {
+    public static BottomOneFragment getInstance() {
         return instance;
     }
 
@@ -67,17 +63,16 @@ public class BottomTwoFragment extends Fragment {
     @Override
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
-        for (int i = 100; i >= 10; i--) {
-            list.add("two->" + i);
+        synchronized (thread) {
+            thread.notify();
         }
     }
+
 
     public void setView(final XRecyclerView view) {
         this.view = view;
         view.setLayoutManager(new StaggeredGridLayoutManager(2, StaggeredGridLayoutManager.VERTICAL));
-        if (mAdapter == null) {
-            mAdapter = new BottomTwoFragment.HomeAdapter();
-        }
+
         mAdapter.setOnItemClickLitener(new HomeAdapter.OnItemClickLitener() {
             @Override
             public void onItemClick(HomeAdapter.MyViewHolder view, int position) {
@@ -115,12 +110,11 @@ public class BottomTwoFragment extends Fragment {
                         history = history + "," + title;
                     }
                 }
-                System.out.println("istory222 = " + history);
+                System.out.println("istory111 = " + history);
                 mmp.edit().putString("History", history).commit();
             }
         });
 
-        view.setAdapter(mAdapter);
         view.setHasFixedSize(true);
         view.setPullRefreshEnabled(false);
         view.setLoadingMoreEnabled(true);
@@ -135,52 +129,84 @@ public class BottomTwoFragment extends Fragment {
             @Override
             public void onLoadMore() {
                 ++page;
-//                loadDate(BottomTwoFragment.this.inputString);
+//                loadDate(BottomOneFragment.this.inputString);
             }
 
         });
 
     }
 
-    public void setInputString(int i, String inputString) {
+    private Context context;
 
-        if (page > 1) {
-
-            page = 1;
-            BottomTwoFragment.this.view.setNoMore(false);
-        }
-
-        System.out.println("cccinputString = " + inputString);
-        this.inputString = inputString;
-        this.sort = i;
-        if (mAdapter == null) {
-            mAdapter = new BottomTwoFragment.HomeAdapter();
-        }
-//        loadDate(this.inputString);
+    @Override
+    public void onAttach(Context context) {
+        this.context = context;
+        super.onAttach(context);
     }
 
+    public void setInputString(String inputString) {
+
+
+        if (mAdapter == null) {
+            mAdapter = new HomeAdapter();
+        }
+        loadDate(this.inputString);
+        System.out.println("xxxinputString = " + inputString);
+    }
+
+    Thread thread = new Thread() {
+        @Override
+        public void run() {
+            //模拟请求网络
+            for (int i = 10; i < 100; i++) {
+                list.add("one->" + i);
+            }
+
+            if (isFirst) {
+                if (view != null) {
+                    handler.sendEmptyMessage(5);
+                    return;
+                }
+            }
+
+            while (true) {
+                System.out.println("BottomOneFragment.run");
+                synchronized (this) {
+                    if (view == null) {
+                        try {
+                            wait();
+                        } catch (InterruptedException e) {
+                            e.printStackTrace();
+                        }
+                    }
+                    handler.sendEmptyMessage(4);
+                    break;
+                }
+            }
+        }
+    };
+
+    private void loadDate(String inputString) {
+        thread.start();
+    }
 
     private Handler handler = new Handler() {
         @Override
         public void handleMessage(Message msg) {
             switch (msg.what) {
-                case 1:
-                    BottomTwoFragment.this.view.loadMoreComplete();
+                case 4:
+                    view.setAdapter(mAdapter);
+                    isFirst = true;
+                    break;
+                case 5:
                     mAdapter.notifyDataSetChanged();
                     break;
-                case 2:
-                    BottomTwoFragment.this.view.setNoMore(true);
-                    mAdapter.notifyDataSetChanged();
-                    break;
-                case 3:
-                    mAdapter.notifyDataSetChanged();
-                    break;
-
             }
+
         }
     };
 
-    static class HomeAdapter extends RecyclerView.Adapter<BottomTwoFragment.HomeAdapter.MyViewHolder> {
+    static class HomeAdapter extends RecyclerView.Adapter<HomeAdapter.MyViewHolder> {
 
         private OnItemClickLitener mOnItemClickLitener;
 
@@ -192,8 +218,9 @@ public class BottomTwoFragment extends Fragment {
             this.mOnItemClickLitener = mOnItemClickLitener;
         }
 
+
         @Override
-        public BottomTwoFragment.HomeAdapter.MyViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
+        public HomeAdapter.MyViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
             ViewDataBinding binding = DataBindingUtil.inflate(LayoutInflater.from(parent.getContext()), R.layout.xhc_itemlayout, null, false);
             MyViewHolder holder = new MyViewHolder(binding);
             return holder;
@@ -211,6 +238,7 @@ public class BottomTwoFragment extends Fragment {
                     }
                 });
             }
+
             XhcItemlayoutBinding binding = (XhcItemlayoutBinding) holder.getBinding();
             String listBean = list.get(position);
             binding.tv.setText(listBean);
@@ -239,29 +267,30 @@ public class BottomTwoFragment extends Fragment {
     }
 
     @Override
+    public void onResume() {
+        super.onResume();
+
+        System.out.println("xxxtest1Fragment.onResume");
+        Fragment fragment = ((MainSearch) getActivity()).getSupportFragmentManager().findFragmentById(R.id.frame);
+        if (fragment instanceof BottomOneFragment) {
+            System.out.println("MainSearchFragment.queryData1111111111=");
+        }
+        if (fragment instanceof BottomTwoFragment) {
+            System.out.println("MainSearchFragment.queryData22222222222");
+        }
+    }
+
+    @Override
     public void onDestroyView() {
-        System.out.println("BottomTwoFragment.onDestroyView");
+        System.out.println("BottomOneFragment.onDestroyView");
         super.onDestroyView();
     }
 
     @Override
     public void onDestroy() {
         list.clear();
-        System.out.println("BottomTwoFragment.onDestroy");
+        page = 1;
+        System.out.println("BottomOneFragment.onDestroy");
         super.onDestroy();
     }
-
-    @Override
-    public void onResume() {
-        super.onResume();
-        Fragment fragment = ((MainSearch) getActivity()).getSupportFragmentManager().findFragmentById(R.id.frame);
-        if (fragment instanceof BottomOneFragment) {
-            System.out.println("MainSearchFragment.queryData333333333");
-        }
-        if (fragment instanceof BottomTwoFragment) {
-            System.out.println("MainSearchFragment.queryData44444444444444=");
-        }
-    }
-
-
 }

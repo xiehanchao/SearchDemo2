@@ -46,7 +46,7 @@
                         android:layout_gravity="center_vertical"
                         android:src="@drawable/search" />
 
-                    <com.example.mac.searchdemo.EditText_Clear
+                    <com.example.mac.searchdemo.view.EditText_Clear
                         android:id="@+id/et_search1"
                         android:layout_width="match_parent"
                         android:layout_height="match_parent"
