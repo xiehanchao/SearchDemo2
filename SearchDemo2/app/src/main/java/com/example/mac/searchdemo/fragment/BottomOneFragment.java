@@ -269,15 +269,6 @@ public class BottomOneFragment extends Fragment {
     @Override
     public void onResume() {
         super.onResume();
-
-        System.out.println("xxxtest1Fragment.onResume");
-        Fragment fragment = ((MainSearch) getActivity()).getSupportFragmentManager().findFragmentById(R.id.frame);
-        if (fragment instanceof BottomOneFragment) {
-            System.out.println("MainSearchFragment.queryData1111111111=");
-        }
-        if (fragment instanceof BottomTwoFragment) {
-            System.out.println("MainSearchFragment.queryData22222222222");
-        }
     }
 
     @Override

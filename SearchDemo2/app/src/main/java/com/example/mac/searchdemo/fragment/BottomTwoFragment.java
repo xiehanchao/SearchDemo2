@@ -279,13 +279,6 @@ public class BottomTwoFragment extends Fragment {
     @Override
     public void onResume() {
         super.onResume();
-        Fragment fragment = ((MainSearch) getActivity()).getSupportFragmentManager().findFragmentById(R.id.frame);
-        if (fragment instanceof BottomOneFragment) {
-            System.out.println("MainSearchFragment.queryData333333333");
-        }
-        if (fragment instanceof BottomTwoFragment) {
-            System.out.println("MainSearchFragment.queryData44444444444444=");
-        }
     }
 
 
