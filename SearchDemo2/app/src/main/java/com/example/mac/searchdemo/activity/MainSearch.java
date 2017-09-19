@@ -15,6 +15,7 @@ import com.example.mac.searchdemo.fragment.SearchHistory;
 public class MainSearch extends AppCompatActivity {
     private SearchHistory searchFragment;
     private BottomOneFragment test1F;
+    private BottomTwoFragment test2F;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -27,11 +28,14 @@ public class MainSearch extends AppCompatActivity {
         fragmentTransaction.commit();
     }
 
-    public void jumpFragment(boolean b, String text) {
-        FragmentManager supportFragmentManager = getSupportFragmentManager();
-        FragmentTransaction fragmentTransaction = supportFragmentManager.beginTransaction();
-        Fragment current = supportFragmentManager.findFragmentById(R.id.frame);
+    public void jumpFragment(boolean b, String text, MainSearchFragment mainSearchFragment, int currentFragment, int btn2Stats) {
+        FragmentManager childFragmentManager = mainSearchFragment.getChildFragmentManager();
+        FragmentTransaction fragmentTransaction = childFragmentManager.beginTransaction();
+        Fragment current = childFragmentManager.findFragmentById(R.id.frame);
+
+
         if (b) {
+
             if (current instanceof SearchHistory) {
 
                 return;
@@ -47,16 +51,39 @@ public class MainSearch extends AppCompatActivity {
         //请求网络
         else {
 
-            if (current instanceof BottomOneFragment || current instanceof BottomTwoFragment) {
-                System.out.println("current = " + current);
+            if (!(current instanceof SearchHistory)) {
+                if(currentFragment==1){
+                    BottomOneFragment one = (BottomOneFragment) childFragmentManager.findFragmentByTag("one");
+                    one.setInputString(text);
+                }else if (currentFragment==2){
+                    BottomTwoFragment two = (BottomTwoFragment) childFragmentManager.findFragmentByTag("two");
+                    two.setInputString(btn2Stats,text);
+                }
+
                 return;
             } else {
-                if (test1F != null) {
-                    fragmentTransaction.replace(R.id.frame, test1F);
-                } else {
-                    test1F = BottomOneFragment.getInstance();
-                    fragmentTransaction.replace(R.id.frame, test1F);
+                Bundle bundle = new Bundle();
+                bundle.putString("text", text);
+
+
+                if (test2F==null){
+                    test2F=new BottomTwoFragment();
                 }
+
+                test2F.setArguments(bundle);
+                fragmentTransaction.add(R.id.frame,test2F,"two");
+                fragmentTransaction.hide(test2F);
+
+                Fragment current1 = childFragmentManager.findFragmentById(R.id.frame);
+                System.out.println("current1 = " + current1);
+                //初始化A
+                if (test1F == null) {
+                    test1F = new BottomOneFragment();
+                }
+
+                test1F.setArguments(bundle);
+                fragmentTransaction.add(R.id.frame,test1F,"one");
+
 
             }
         }

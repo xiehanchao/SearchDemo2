@@ -1,8 +1,8 @@
 package com.example.mac.searchdemo.fragment;
 
+import android.content.res.Resources;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
-import android.support.annotation.IdRes;
 import android.support.annotation.Nullable;
 import android.support.design.widget.AppBarLayout;
 import android.support.design.widget.CollapsingToolbarLayout;
@@ -27,6 +27,9 @@ import com.example.mac.searchdemo.view.EditText_Clear;
  * Created by MAC on 2017/8/29.
  */
 
+/**
+ * 1.当多次add之后，currentFragment为最后一次的Fragment
+ */
 public class MainSearchFragment extends Fragment {
 
     private FragmentTransaction fragmentTransaction;
@@ -35,19 +38,29 @@ public class MainSearchFragment extends Fragment {
     private BottomTwoFragment test2F;
     private RadioButton btn1;
     private RadioButton btn2;
-    private int price_sort = 1;
     private Drawable down;
     private Drawable up;
     String text;
-    private String histoyry;
     private EditText_Clear editText_clear;
-    private boolean isCheck = false;
+    //1为one
+    //2为two
+    private int currentFragment = 1;
+    //1为btn2箭头向上
+    //-1为btn2箭头向下
+    private int btn2Stats = 1;
 
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.activity_w, container, false);
         return view;
+    }
+
+    public Fragment currentFragment() {
+        FragmentManager childFragmentManager = getChildFragmentManager();
+        FragmentTransaction fragmentTransaction = childFragmentManager.beginTransaction();
+        return childFragmentManager.findFragmentById(R.id.frame);
+
     }
 
     @Override
@@ -67,31 +80,64 @@ public class MainSearchFragment extends Fragment {
         fragmentTransaction.replace(R.id.frame, searchH);
         fragmentTransaction.commit();
         btn1 = (RadioButton) view.findViewById(R.id.btn1);
-        btn1.setChecked(true);
+        btn1.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                currentFragment = 1;
+                FragmentManager childFragmentManager = getChildFragmentManager();
+                FragmentTransaction fragmentTransaction = childFragmentManager.beginTransaction();
+                BottomOneFragment one = (BottomOneFragment) childFragmentManager.findFragmentByTag("one");
+                BottomTwoFragment two = (BottomTwoFragment) childFragmentManager.findFragmentByTag("two");
+                Fragment currentF = currentFragment();
+                System.out.println("currentF = " + currentF);
+                //one是隐藏的，将其显示
+                if (one.isHidden()) {
+                    fragmentTransaction.show(one);
+                    //two不是隐藏，将其隐藏
+                    if (!two.isHidden()) {
+                        fragmentTransaction.hide(two);
+                    }
+                }
+
+                fragmentTransaction.commit();
+            }
+        });
+
+
         btn2 = (RadioButton) view.findViewById(R.id.btn2);
         btn2.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                test2F = BottomTwoFragment.getInstance();
-                if (isCheck) {
-                    price_sort = 1;
-                    up.setBounds(0, 0, up.getMinimumWidth(), up.getMinimumHeight());
-                    btn2.setCompoundDrawables(null, null, up, null);
-                    test2F.setInputString(1, text);
-                    isCheck = false;
-                    return;
+                System.out.println("currentFragment = " + currentFragment);
+                if (currentFragment == 2) {
+                    if (btn2Stats == 1) {
+                        down.setBounds(0, 0, down.getMinimumWidth(), down.getMinimumHeight());
+                        btn2.setCompoundDrawables(null, null, down, null);
+                        btn2Stats = -1;
+                    } else {
+                        up.setBounds(0, 0, up.getMinimumWidth(), up.getMinimumHeight());
+                        btn2.setCompoundDrawables(null, null, up, null);
+                        btn2Stats = 1;
+                    }
                 }
-                if (price_sort == 1) {
-                    price_sort = 2;
-                    down.setBounds(0, 0, down.getMinimumWidth(), down.getMinimumHeight());
-                    btn2.setCompoundDrawables(null, null, down, null);
-                    test2F.setInputString(2, text);
-                } else {
-                    price_sort = 1;
-                    up.setBounds(0, 0, up.getMinimumWidth(), up.getMinimumHeight());
-                    btn2.setCompoundDrawables(null, null, up, null);
-                    test2F.setInputString(1, text);
+
+                currentFragment = 2;
+                FragmentManager childFragmentManager = getChildFragmentManager();
+                FragmentTransaction fragmentTransaction = childFragmentManager.beginTransaction();
+                BottomOneFragment one = (BottomOneFragment) childFragmentManager.findFragmentByTag("one");
+                BottomTwoFragment two = (BottomTwoFragment) childFragmentManager.findFragmentByTag("two");
+                Fragment currentF = currentFragment();
+                System.out.println("currentF = " + currentF);
+                //two是隐藏的，将其显示
+                if (two.isHidden()) {
+                    fragmentTransaction.show(two);
+                    //one不是隐藏，将其隐藏
+                    if (!one.isHidden()) {
+                        fragmentTransaction.hide(one);
+                    }
                 }
+
+                fragmentTransaction.commit();
             }
         });
         editText_clear = (EditText_Clear) view.findViewById(R.id.et_search1);
@@ -110,19 +156,17 @@ public class MainSearchFragment extends Fragment {
             @Override
             public void afterTextChanged(Editable s) {
                 text = editText_clear.getText().toString().trim();
+
                 if (TextUtils.isEmpty(text)) {
+                    currentFragment = 1;
+                    btn2Stats = 1;
+                    btn1.setChecked(true);
                     AppBarLayout appbarlayout = (AppBarLayout) view.findViewById(R.id.appbarlayout);
                     CollapsingToolbarLayout collapsingToolbarLayout = (CollapsingToolbarLayout) appbarlayout.getChildAt(0);
                     AppBarLayout.LayoutParams mParams = (AppBarLayout.LayoutParams) collapsingToolbarLayout.getLayoutParams();
                     mParams.setScrollFlags(0);
                     collapsingToolbarLayout.setLayoutParams(mParams);
 
-                    if (test2F == null) {
-                        test2F = BottomTwoFragment.getInstance();
-
-                    }
-                    price_sort = 1;
-                    test2F.sort = 1;
                     if (android.os.Build.VERSION.SDK_INT >= 21) {
                         up = getResources().getDrawable(R.drawable.up, getContext().getTheme());
                     } else {
@@ -130,77 +174,36 @@ public class MainSearchFragment extends Fragment {
                     }
                     up.setBounds(0, 0, up.getMinimumWidth(), up.getMinimumHeight());
                     btn2.setCompoundDrawables(null, null, up, null);
-
-                    btn1.setChecked(true);
                     tab.setVisibility(View.GONE);
-                    mainActivity.jumpFragment(true, text);
+                    mainActivity.jumpFragment(true, text, MainSearchFragment.this, 0, 0);
                 } else {
+
                     AppBarLayout appbarlayout = (AppBarLayout) view.findViewById(R.id.appbarlayout);
                     CollapsingToolbarLayout collapsingToolbarLayout = (CollapsingToolbarLayout) appbarlayout.getChildAt(0);
                     AppBarLayout.LayoutParams mParams = (AppBarLayout.LayoutParams) collapsingToolbarLayout.getLayoutParams();
                     mParams.setScrollFlags(AppBarLayout.LayoutParams.SCROLL_FLAG_SCROLL);
                     collapsingToolbarLayout.setLayoutParams(mParams);
-                    if (btn1.isChecked()) {
-                        if (test1F == null) {
-                            test1F = BottomOneFragment.getInstance();
-                        }
-                        test1F.setInputString(text);
-                    }
-                    if (btn2.isChecked()) {
-                        if (test2F == null) {
-                            test2F = BottomTwoFragment.getInstance();
-                        }
-                        test2F.setInputString(1, text);
-                    }
                     tab.setVisibility(View.VISIBLE);
-                    mainActivity.jumpFragment(false, text);
+                    mainActivity.jumpFragment(false, text, MainSearchFragment.this, currentFragment, btn2Stats);
                 }
             }
         });
-
-
-        tab.setOnCheckedChangeListener(new RadioGroup.OnCheckedChangeListener() {
-            @Override
-            public void onCheckedChanged(RadioGroup group, @IdRes int checkedId) {
-                FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
-                text = editText_clear.getText().toString().trim();
-                if (checkedId == btn1.getId()) {
-
-                    isCheck = false;
-                    btn1.setBackgroundResource(R.drawable.draw_line);
-                    btn2.setBackgroundResource(R.drawable.white_back);
-
-                    if (test1F == null) {
-                        test1F = BottomOneFragment.getInstance();
-                    }
-                    fragmentTransaction.replace(R.id.frame, test1F);
-                    if (android.os.Build.VERSION.SDK_INT >= 21) {
-                        up = getResources().getDrawable(R.drawable.up, getContext().getTheme());
-                    } else {
-                        up = getResources().getDrawable(R.drawable.up);
-                    }
-                    test1F.setInputString(text);
-                } else if (checkedId == btn2.getId()) {
-
-                    btn2.setBackgroundResource(R.drawable.draw_line);
-                    btn1.setBackgroundResource(R.drawable.white_back);
-                    if (test2F == null) {
-                        test2F = BottomTwoFragment.getInstance();
-                    }
-                    fragmentTransaction.replace(R.id.frame, test2F);
-                    isCheck = true;
-                }
-                fragmentTransaction.commit();
-            }
-
-        });
-
     }
+
     @Override
     public void onHiddenChanged(boolean hidden) {
         super.onHiddenChanged(hidden);
 
     }
+
+    @Override
+    public void onDestroy() {
+        System.out.println("MainSearchFragment.onDestroy");
+        currentFragment = 1;
+        btn2Stats = 1;
+        super.onDestroy();
+    }
+
     @Override
     public void onResume() {
         super.onResume();

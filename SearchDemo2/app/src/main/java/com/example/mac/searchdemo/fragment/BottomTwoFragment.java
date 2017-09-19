@@ -43,9 +43,6 @@ public class BottomTwoFragment extends Fragment {
     private static final BottomTwoFragment instance = new BottomTwoFragment();
     private boolean isFirst = false;
 
-    private BottomTwoFragment() {
-
-    }
 
     private Context context;
 
@@ -55,14 +52,16 @@ public class BottomTwoFragment extends Fragment {
         super.onAttach(context);
     }
 
-    public static BottomTwoFragment getInstance() {
-        return instance;
-    }
 
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         binding = DataBindingUtil.inflate(inflater, R.layout.context_text1, container, false);
+        Bundle bundle = getArguments();
+        if (bundle != null) {
+            String item = bundle.getString("text");
+            System.out.println("1111itemtwo = " + item);
+        }
         setView(binding.out);
         return binding.out;
     }
@@ -70,15 +69,17 @@ public class BottomTwoFragment extends Fragment {
     @Override
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
-        synchronized (thread) {
-            thread.notify();
-        }
     }
 
     public void setView(final XRecyclerView view) {
         this.view = view;
+        for (int i = 10; i <= 99; i++) {
+            list.add("one->" + i);
+        }
         view.setLayoutManager(new StaggeredGridLayoutManager(2, StaggeredGridLayoutManager.VERTICAL));
-
+        if (mAdapter == null) {
+            mAdapter = new BottomTwoFragment.HomeAdapter();
+        }
         mAdapter.setOnItemClickLitener(new HomeAdapter.OnItemClickLitener() {
             @Override
             public void onItemClick(HomeAdapter.MyViewHolder view, int position) {
@@ -122,6 +123,7 @@ public class BottomTwoFragment extends Fragment {
         });
 
 
+        view.setAdapter(mAdapter);
         view.setHasFixedSize(true);
         view.setPullRefreshEnabled(false);
         view.setLoadingMoreEnabled(true);
@@ -136,73 +138,18 @@ public class BottomTwoFragment extends Fragment {
             @Override
             public void onLoadMore() {
                 ++page;
-//                loadDate(BottomTwoFragment.this.inputString);
             }
 
         });
 
     }
 
-    Thread thread = new Thread() {
-        @Override
-        public void run() {
-            //模拟请求网络
-            for (int i = 99; i >= 10; i--) {
-                list.add("one->" + i);
-            }
-
-            if (isFirst) {
-                if (view != null) {
-                    handler.sendEmptyMessage(5);
-                    return;
-                }
-            }
-
-            while (true) {
-                System.out.println("BottomOneFragment.run");
-                synchronized (this) {
-                    if (view == null) {
-                        try {
-                            wait();
-                        } catch (InterruptedException e) {
-                            e.printStackTrace();
-                        }
-                    }
-                    handler.sendEmptyMessage(4);
-                    break;
-                }
-            }
-        }
-    };
 
     public void setInputString(int i, String inputString) {
-
-
-        if (mAdapter == null) {
-            mAdapter = new BottomTwoFragment.HomeAdapter();
-        }
-        loadDate(this.inputString);
+        //请求网络
+        //Adapter进行刷新处理
+        System.out.println("BottomTwoFragment "+inputString+"=="+i);
     }
-
-    private void loadDate(String inputString) {
-        thread.start();
-    }
-
-    private Handler handler = new Handler() {
-        @Override
-        public void handleMessage(Message msg) {
-            switch (msg.what) {
-                case 4:
-                    view.setAdapter(mAdapter);
-                    isFirst = true;
-                    break;
-                case 5:
-                    mAdapter.notifyDataSetChanged();
-                    break;
-            }
-
-        }
-    };
 
 
     static class HomeAdapter extends RecyclerView.Adapter<BottomTwoFragment.HomeAdapter.MyViewHolder> {
@@ -244,7 +191,7 @@ public class BottomTwoFragment extends Fragment {
 
         @Override
         public int getItemCount() {
-            System.out.println("xxxHomeAdapter.getItemCount==" + list.size());
+//            System.out.println("xxxHomeAdapter.getItemCount==" + list.size());
             return list.size();
         }
 
@@ -271,7 +218,8 @@ public class BottomTwoFragment extends Fragment {
 
     @Override
     public void onDestroy() {
-        list.clear();
+        isFirst = false;
+//        list.clear();
         System.out.println("BottomTwoFragment.onDestroy");
         super.onDestroy();
     }
