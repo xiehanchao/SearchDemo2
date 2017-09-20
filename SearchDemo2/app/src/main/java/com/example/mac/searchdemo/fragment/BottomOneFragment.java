@@ -9,6 +9,7 @@ import android.os.Handler;
 import android.os.Message;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
+import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.StaggeredGridLayoutManager;
 import android.text.TextUtils;
@@ -20,6 +21,7 @@ import com.example.mac.searchdemo.R;
 import com.example.mac.searchdemo.activity.MainSearch;
 import com.example.mac.searchdemo.databinding.ContextText1Binding;
 import com.example.mac.searchdemo.databinding.XhcItemlayoutBinding;
+import com.example.mac.searchdemo.utils.Utils;
 import com.jcodecraeer.xrecyclerview.ProgressStyle;
 import com.jcodecraeer.xrecyclerview.XRecyclerView;
 
@@ -33,28 +35,21 @@ import java.util.List;
 
 public class BottomOneFragment extends Fragment {
     private static List<String> list = new ArrayList<String>();
-    private static List<String> networkList = new ArrayList<String>();
-    private boolean isFirst = false;
     private HomeAdapter mAdapter;
-    private String inputString;
     private ContextText1Binding binding;
-    private int page = 1;
-    private int pageCount = 1;
-    //类加载时就初始化
-    private static final BottomOneFragment instance = new BottomOneFragment();
+    private int page = 0;
     private XRecyclerView view;
-
-//    private BottomOneFragment() {
-//
-//    }
-//
-//    public static BottomOneFragment getInstance() {
-//        return instance;
-//    }
+    private Context context;
+    @Override
+    public void onCreate(@Nullable Bundle savedInstanceState) {
+        System.out.println("BottomOneFragment.onCreate");
+        super.onCreate(savedInstanceState);
+    }
 
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
+        System.out.println("BottomOneFragment.onCreateView");
         binding = DataBindingUtil.inflate(inflater, R.layout.context_text1, container, false);
         Bundle bundle = getArguments();
         if (bundle != null) {
@@ -73,10 +68,10 @@ public class BottomOneFragment extends Fragment {
 
     public void setView(final XRecyclerView view) {
         this.view = view;
-        for (int i = 99; i >= 10; i--) {
+        for (int i = 40; i >= 10; i--) {
             list.add("one->" + i);
         }
-        view.setLayoutManager(new StaggeredGridLayoutManager(2, StaggeredGridLayoutManager.VERTICAL));
+        view.setLayoutManager(new GridLayoutManager(context, 2));
         if (mAdapter == null) {
             mAdapter = new BottomOneFragment.HomeAdapter();
         }
@@ -136,14 +131,37 @@ public class BottomOneFragment extends Fragment {
             @Override
             public void onLoadMore() {
                 ++page;
-//                loadDate(BottomOneFragment.this.inputString);
+                System.out.println("page = " + page);
+                List<String> list = Utils.LoadMore(page);
+                if (list.size() > 0) {
+                    BottomOneFragment.this.list.addAll(list);
+                    handle.sendEmptyMessageDelayed(1, 5000);
+                } else {
+                    handle.sendEmptyMessageDelayed(2, 5000);
+
+                }
             }
 
         });
 
     }
 
-    private Context context;
+    Handler handle = new Handler() {
+        @Override
+        public void handleMessage(Message msg) {
+            switch (msg.what) {
+                case 1:
+                    mAdapter.notifyDataSetChanged();
+                    view.loadMoreComplete();
+                    break;
+                case 2:
+                    view.setNoMore(true);
+                    break;
+            }
+        }
+    };
+
+
 
     @Override
     public void onAttach(Context context) {
@@ -154,7 +172,15 @@ public class BottomOneFragment extends Fragment {
     public void setInputString(String inputString) {
         //请求网络
         //Adapter进行刷新处理
-        System.out.println("BottomOneFragment "+inputString);
+        view.setNoMore(false);
+        page = 0;
+        System.out.println("BottomOneFragment " + inputString);
+        List<String> list = Utils.getList();
+        if (list.size() > 0) {
+            //请求网络成功
+            this.list = list;
+            mAdapter.notifyDataSetChanged();
+        }
     }
 
 
@@ -231,9 +257,16 @@ public class BottomOneFragment extends Fragment {
 
     @Override
     public void onDestroy() {
-//        list.clear();
-        isFirst = false;
+        list.clear();
+        view.setNoMore(false);
+        page = 0;
         System.out.println("BottomOneFragment.onDestroy");
         super.onDestroy();
+    }
+
+    @Override
+    public void onDetach() {
+        System.out.println("BottomOneFragment.onDetach");
+        super.onDetach();
     }
 }

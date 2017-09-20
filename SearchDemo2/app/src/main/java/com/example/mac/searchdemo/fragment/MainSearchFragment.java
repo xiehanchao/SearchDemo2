@@ -48,6 +48,8 @@ public class MainSearchFragment extends Fragment {
     //1为btn2箭头向上
     //-1为btn2箭头向下
     private int btn2Stats = 1;
+    //文字是否改变了，如果文字改变了，切换btn1和btn2标签应该更新数据。
+    private boolean isTextChange = false;
 
     @Nullable
     @Override
@@ -84,12 +86,18 @@ public class MainSearchFragment extends Fragment {
             @Override
             public void onClick(View v) {
                 currentFragment = 1;
+
                 FragmentManager childFragmentManager = getChildFragmentManager();
                 FragmentTransaction fragmentTransaction = childFragmentManager.beginTransaction();
                 BottomOneFragment one = (BottomOneFragment) childFragmentManager.findFragmentByTag("one");
                 BottomTwoFragment two = (BottomTwoFragment) childFragmentManager.findFragmentByTag("two");
+
+                if (isTextChange) {
+                    one.setInputString(text);
+                    isTextChange = false;
+                }
+
                 Fragment currentF = currentFragment();
-                System.out.println("currentF = " + currentF);
                 //one是隐藏的，将其显示
                 if (one.isHidden()) {
                     fragmentTransaction.show(one);
@@ -108,26 +116,28 @@ public class MainSearchFragment extends Fragment {
         btn2.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                System.out.println("currentFragment = " + currentFragment);
+                FragmentManager childFragmentManager = getChildFragmentManager();
+                FragmentTransaction fragmentTransaction = childFragmentManager.beginTransaction();
+                BottomOneFragment one = (BottomOneFragment) childFragmentManager.findFragmentByTag("one");
+                BottomTwoFragment two = (BottomTwoFragment) childFragmentManager.findFragmentByTag("two");
+                if (isTextChange && currentFragment != 2) {
+                    two.setInputString(btn2Stats, text);
+                    isTextChange = false;
+                }
                 if (currentFragment == 2) {
                     if (btn2Stats == 1) {
                         down.setBounds(0, 0, down.getMinimumWidth(), down.getMinimumHeight());
                         btn2.setCompoundDrawables(null, null, down, null);
                         btn2Stats = -1;
+                        two.setInputString(btn2Stats, text);
                     } else {
                         up.setBounds(0, 0, up.getMinimumWidth(), up.getMinimumHeight());
                         btn2.setCompoundDrawables(null, null, up, null);
                         btn2Stats = 1;
+                        two.setInputString(btn2Stats, text);
                     }
                 }
-
                 currentFragment = 2;
-                FragmentManager childFragmentManager = getChildFragmentManager();
-                FragmentTransaction fragmentTransaction = childFragmentManager.beginTransaction();
-                BottomOneFragment one = (BottomOneFragment) childFragmentManager.findFragmentByTag("one");
-                BottomTwoFragment two = (BottomTwoFragment) childFragmentManager.findFragmentByTag("two");
-                Fragment currentF = currentFragment();
-                System.out.println("currentF = " + currentF);
                 //two是隐藏的，将其显示
                 if (two.isHidden()) {
                     fragmentTransaction.show(two);
@@ -156,7 +166,10 @@ public class MainSearchFragment extends Fragment {
             @Override
             public void afterTextChanged(Editable s) {
                 text = editText_clear.getText().toString().trim();
-
+                Fragment fragment = currentFragment();
+                if (!(fragment instanceof SearchHistory)) {
+                    isTextChange = true;
+                }
                 if (TextUtils.isEmpty(text)) {
                     currentFragment = 1;
                     btn2Stats = 1;

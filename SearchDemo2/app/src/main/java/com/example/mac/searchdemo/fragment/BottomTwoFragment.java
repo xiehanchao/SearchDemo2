@@ -9,6 +9,7 @@ import android.os.Handler;
 import android.os.Message;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
+import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.StaggeredGridLayoutManager;
 import android.text.TextUtils;
@@ -20,6 +21,7 @@ import com.example.mac.searchdemo.R;
 import com.example.mac.searchdemo.activity.MainSearch;
 import com.example.mac.searchdemo.databinding.ContextText1Binding;
 import com.example.mac.searchdemo.databinding.XhcItemlayoutBinding;
+import com.example.mac.searchdemo.utils.Utils;
 import com.jcodecraeer.xrecyclerview.ProgressStyle;
 import com.jcodecraeer.xrecyclerview.XRecyclerView;
 
@@ -33,17 +35,9 @@ import java.util.List;
 public class BottomTwoFragment extends Fragment {
     private static List<String> list = new ArrayList<String>();
     private BottomTwoFragment.HomeAdapter mAdapter;
-    private String inputString;
     private ContextText1Binding binding;
-    //升序 剪头向上
-    public int sort = 1;
-    private int page = 1;
+    private int page = 0;
     private XRecyclerView view;
-    //类加载时就初始化
-    private static final BottomTwoFragment instance = new BottomTwoFragment();
-    private boolean isFirst = false;
-
-
     private Context context;
 
     @Override
@@ -73,10 +67,10 @@ public class BottomTwoFragment extends Fragment {
 
     public void setView(final XRecyclerView view) {
         this.view = view;
-        for (int i = 10; i <= 99; i++) {
+        for (int i = 10; i <= 40; i++) {
             list.add("one->" + i);
         }
-        view.setLayoutManager(new StaggeredGridLayoutManager(2, StaggeredGridLayoutManager.VERTICAL));
+        view.setLayoutManager(new GridLayoutManager(context, 2));
         if (mAdapter == null) {
             mAdapter = new BottomTwoFragment.HomeAdapter();
         }
@@ -138,6 +132,15 @@ public class BottomTwoFragment extends Fragment {
             @Override
             public void onLoadMore() {
                 ++page;
+                System.out.println("page = " + page);
+                List<String> list = Utils.LoadMore(page);
+                if (list.size() > 0) {
+                    BottomTwoFragment.this.list.addAll(list);
+                    handle.sendEmptyMessageDelayed(1, 5000);
+                } else {
+                    handle.sendEmptyMessageDelayed(2, 5000);
+
+                }
             }
 
         });
@@ -148,10 +151,31 @@ public class BottomTwoFragment extends Fragment {
     public void setInputString(int i, String inputString) {
         //请求网络
         //Adapter进行刷新处理
-        System.out.println("BottomTwoFragment "+inputString+"=="+i);
+        System.out.println("BottomTwoFragment " + inputString + "==" + i);
+        view.setNoMore(false);
+        page = 0;
+        List<String> list = Utils.getList();
+        if (list.size() > 0) {
+            //请求网络成功
+            this.list = list;
+            mAdapter.notifyDataSetChanged();
+        }
     }
 
-
+    Handler handle = new Handler() {
+        @Override
+        public void handleMessage(Message msg) {
+            switch (msg.what) {
+                case 1:
+                    mAdapter.notifyDataSetChanged();
+                    view.loadMoreComplete();
+                    break;
+                case 2:
+                    view.setNoMore(true);
+                    break;
+            }
+        }
+    };
     static class HomeAdapter extends RecyclerView.Adapter<BottomTwoFragment.HomeAdapter.MyViewHolder> {
 
         private OnItemClickLitener mOnItemClickLitener;
@@ -218,8 +242,9 @@ public class BottomTwoFragment extends Fragment {
 
     @Override
     public void onDestroy() {
-        isFirst = false;
-//        list.clear();
+        list.clear();
+        view.setNoMore(false);
+        page = 0;
         System.out.println("BottomTwoFragment.onDestroy");
         super.onDestroy();
     }
