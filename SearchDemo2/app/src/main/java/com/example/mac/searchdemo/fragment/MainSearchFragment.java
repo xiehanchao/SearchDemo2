@@ -80,7 +80,7 @@ public class MainSearchFragment extends Fragment {
         }
         fragmentTransaction = fragmentManager.beginTransaction();
         fragmentTransaction.replace(R.id.frame, searchH);
-        fragmentTransaction.commit();
+        fragmentTransaction.commitAllowingStateLoss();
         btn1 = (RadioButton) view.findViewById(R.id.btn1);
         btn1.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -107,7 +107,7 @@ public class MainSearchFragment extends Fragment {
                     }
                 }
 
-                fragmentTransaction.commit();
+                fragmentTransaction.commitAllowingStateLoss();
             }
         });
 
@@ -147,7 +147,7 @@ public class MainSearchFragment extends Fragment {
                     }
                 }
 
-                fragmentTransaction.commit();
+                fragmentTransaction.commitAllowingStateLoss();
             }
         });
         editText_clear = (EditText_Clear) view.findViewById(R.id.et_search1);

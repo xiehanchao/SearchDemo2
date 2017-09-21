@@ -242,11 +242,19 @@ public class BottomTwoFragment extends Fragment {
 
     @Override
     public void onDestroy() {
+        mAdapter=null;
         list.clear();
         view.setNoMore(false);
         page = 0;
+        view=null;
         System.out.println("BottomTwoFragment.onDestroy");
         super.onDestroy();
+    }
+
+    @Override
+    public void onDetach() {
+        System.out.println("BottomTwoFragment.onDetach");
+        super.onDetach();
     }
 
     @Override

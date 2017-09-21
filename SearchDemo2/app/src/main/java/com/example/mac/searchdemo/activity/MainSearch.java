@@ -25,7 +25,7 @@ public class MainSearch extends AppCompatActivity {
         FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
         MainSearchFragment myFragment_1 = new MainSearchFragment();
         fragmentTransaction.add(R.id.id_content, myFragment_1, "myFragment");
-        fragmentTransaction.commit();
+        fragmentTransaction.commitAllowingStateLoss();
     }
 
     public void jumpFragment(boolean b, String text, MainSearchFragment mainSearchFragment, int currentFragment, int btn2Stats) {
@@ -52,12 +52,12 @@ public class MainSearch extends AppCompatActivity {
         else {
 
             if (!(current instanceof SearchHistory)) {
-                if(currentFragment==1){
+                if (currentFragment == 1) {
                     BottomOneFragment one = (BottomOneFragment) childFragmentManager.findFragmentByTag("one");
                     one.setInputString(text);
-                }else if (currentFragment==2){
+                } else if (currentFragment == 2) {
                     BottomTwoFragment two = (BottomTwoFragment) childFragmentManager.findFragmentByTag("two");
-                    two.setInputString(btn2Stats,text);
+                    two.setInputString(btn2Stats, text);
                 }
 
                 return;
@@ -66,12 +66,13 @@ public class MainSearch extends AppCompatActivity {
                 bundle.putString("text", text);
 
 
-                if (test2F==null){
-                    test2F=new BottomTwoFragment();
+                if (test2F == null) {
+                    test2F = new BottomTwoFragment();
                 }
 
                 test2F.setArguments(bundle);
-                fragmentTransaction.add(R.id.frame,test2F,"two");
+
+                fragmentTransaction.add(R.id.frame, test2F, "two");
                 fragmentTransaction.hide(test2F);
 
                 Fragment current1 = childFragmentManager.findFragmentById(R.id.frame);
@@ -82,11 +83,11 @@ public class MainSearch extends AppCompatActivity {
                 }
 
                 test1F.setArguments(bundle);
-                fragmentTransaction.add(R.id.frame,test1F,"one");
+                fragmentTransaction.add(R.id.frame, test1F, "one");
 
 
             }
         }
-        fragmentTransaction.commit();
+        fragmentTransaction.commitAllowingStateLoss();
     }
 }

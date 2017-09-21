@@ -37,12 +37,12 @@ public class BottomOneFragment extends Fragment {
     private static List<String> list = new ArrayList<String>();
     private HomeAdapter mAdapter;
     private ContextText1Binding binding;
-    private int page = 0;
+    public  int page = 0;
     private XRecyclerView view;
     private Context context;
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
-        System.out.println("BottomOneFragment.onCreate");
+
         super.onCreate(savedInstanceState);
     }
 
@@ -130,6 +130,8 @@ public class BottomOneFragment extends Fragment {
 
             @Override
             public void onLoadMore() {
+                System.out.println("context = " + this);
+                //加载下一页
                 ++page;
                 System.out.println("page = " + page);
                 List<String> list = Utils.LoadMore(page);
@@ -257,9 +259,11 @@ public class BottomOneFragment extends Fragment {
 
     @Override
     public void onDestroy() {
+        mAdapter=null;
         list.clear();
         view.setNoMore(false);
         page = 0;
+        view=null;
         System.out.println("BottomOneFragment.onDestroy");
         super.onDestroy();
     }
