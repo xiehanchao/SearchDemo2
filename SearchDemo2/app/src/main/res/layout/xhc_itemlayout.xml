@@ -19,6 +19,7 @@
                 android:id="@+id/icon_iv"
 
                 android:layout_width="369px"
+
                 android:layout_height="384px"
                 android:layout_gravity="center_horizontal"
                 android:scaleType="centerCrop" />
