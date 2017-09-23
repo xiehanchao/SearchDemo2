@@ -12,6 +12,7 @@ import android.support.v4.app.FragmentTransaction;
 import android.text.Editable;
 import android.text.TextUtils;
 import android.text.TextWatcher;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -67,6 +68,7 @@ public class MainSearchFragment extends Fragment {
 
     @Override
     public void onViewCreated(final View view, @Nullable final Bundle savedInstanceState) {
+        System.out.println("MainSearchFragment.onViewCreated");
         final RadioGroup tab = (RadioGroup) view.findViewById(R.id.sliding_tabs1);
         SearchHistory searchH = new SearchHistory();
         final MainSearch mainActivity = (MainSearch) getActivity();
@@ -152,55 +154,61 @@ public class MainSearchFragment extends Fragment {
         });
         editText_clear = (EditText_Clear) view.findViewById(R.id.et_search1);
 
-        editText_clear.addTextChangedListener(new TextWatcher() {
-            @Override
-            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+        if (editText_clear.getTag() == null) {
+            editText_clear.addTextChangedListener(new TextWatcher() {
 
-            }
-
-            @Override
-            public void onTextChanged(CharSequence s, int start, int before, int count) {
-
-            }
-
-            @Override
-            public void afterTextChanged(Editable s) {
-                text = editText_clear.getText().toString().trim();
-                Fragment fragment = currentFragment();
-                if (!(fragment instanceof SearchHistory)) {
-                    isTextChange = true;
+                @Override
+                public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+                    System.out.println("MainSearchFragment.beforeTextChanged");
                 }
-                if (TextUtils.isEmpty(text)) {
-                    currentFragment = 1;
-                    btn2Stats = 1;
-                    btn1.setChecked(true);
-                    AppBarLayout appbarlayout = (AppBarLayout) view.findViewById(R.id.appbarlayout);
-                    CollapsingToolbarLayout collapsingToolbarLayout = (CollapsingToolbarLayout) appbarlayout.getChildAt(0);
-                    AppBarLayout.LayoutParams mParams = (AppBarLayout.LayoutParams) collapsingToolbarLayout.getLayoutParams();
-                    mParams.setScrollFlags(0);
-                    collapsingToolbarLayout.setLayoutParams(mParams);
 
-                    if (android.os.Build.VERSION.SDK_INT >= 21) {
-                        up = getResources().getDrawable(R.drawable.up, getContext().getTheme());
-                    } else {
-                        up = getResources().getDrawable(R.drawable.up);
+                @Override
+                public void onTextChanged(CharSequence s, int start, int before, int count) {
+                    System.out.println("MainSearchFragment.onTextChanged");
+                }
+
+                @Override
+                public void afterTextChanged(Editable s) {
+                    System.out.println("MainSearchFragment.afterTextChanged=================");
+                    text = editText_clear.getText().toString().trim();
+                    Fragment fragment = currentFragment();
+                    if (!(fragment instanceof SearchHistory)) {
+                        isTextChange = true;
                     }
-                    up.setBounds(0, 0, up.getMinimumWidth(), up.getMinimumHeight());
-                    btn2.setCompoundDrawables(null, null, up, null);
-                    tab.setVisibility(View.GONE);
-                    mainActivity.jumpFragment(true, text, MainSearchFragment.this, 0, 0);
-                } else {
+                    if (TextUtils.isEmpty(text)) {
+                        currentFragment = 1;
+                        btn2Stats = 1;
+                        btn1.setChecked(true);
+                        AppBarLayout appbarlayout = (AppBarLayout) view.findViewById(R.id.appbarlayout);
+                        CollapsingToolbarLayout collapsingToolbarLayout = (CollapsingToolbarLayout) appbarlayout.getChildAt(0);
+                        AppBarLayout.LayoutParams mParams = (AppBarLayout.LayoutParams) collapsingToolbarLayout.getLayoutParams();
+                        mParams.setScrollFlags(0);
+                        collapsingToolbarLayout.setLayoutParams(mParams);
 
-                    AppBarLayout appbarlayout = (AppBarLayout) view.findViewById(R.id.appbarlayout);
-                    CollapsingToolbarLayout collapsingToolbarLayout = (CollapsingToolbarLayout) appbarlayout.getChildAt(0);
-                    AppBarLayout.LayoutParams mParams = (AppBarLayout.LayoutParams) collapsingToolbarLayout.getLayoutParams();
-                    mParams.setScrollFlags(AppBarLayout.LayoutParams.SCROLL_FLAG_SCROLL);
-                    collapsingToolbarLayout.setLayoutParams(mParams);
-                    tab.setVisibility(View.VISIBLE);
-                    mainActivity.jumpFragment(false, text, MainSearchFragment.this, currentFragment, btn2Stats);
+                        if (android.os.Build.VERSION.SDK_INT >= 21) {
+                            up = getResources().getDrawable(R.drawable.up, getContext().getTheme());
+                        } else {
+                            up = getResources().getDrawable(R.drawable.up);
+                        }
+                        up.setBounds(0, 0, up.getMinimumWidth(), up.getMinimumHeight());
+                        btn2.setCompoundDrawables(null, null, up, null);
+                        tab.setVisibility(View.GONE);
+                        mainActivity.jumpFragment(true, text, MainSearchFragment.this, 0, 0);
+                    } else {
+
+                        AppBarLayout appbarlayout = (AppBarLayout) view.findViewById(R.id.appbarlayout);
+                        CollapsingToolbarLayout collapsingToolbarLayout = (CollapsingToolbarLayout) appbarlayout.getChildAt(0);
+                        AppBarLayout.LayoutParams mParams = (AppBarLayout.LayoutParams) collapsingToolbarLayout.getLayoutParams();
+                        mParams.setScrollFlags(AppBarLayout.LayoutParams.SCROLL_FLAG_SCROLL);
+                        collapsingToolbarLayout.setLayoutParams(mParams);
+                        tab.setVisibility(View.VISIBLE);
+                        mainActivity.jumpFragment(false, text, MainSearchFragment.this, currentFragment, btn2Stats);
+                    }
                 }
-            }
-        });
+            });
+        }
+        editText_clear.setTag("first");
+
     }
 
     @Override

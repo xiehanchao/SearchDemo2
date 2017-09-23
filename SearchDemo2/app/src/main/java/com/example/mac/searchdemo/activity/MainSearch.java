@@ -24,6 +24,7 @@ public class MainSearch extends AppCompatActivity {
         FragmentManager fragmentManager = getSupportFragmentManager();
         FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
         MainSearchFragment myFragment_1 = new MainSearchFragment();
+        System.out.println("MainSearch.onCreate");
         fragmentTransaction.add(R.id.id_content, myFragment_1, "myFragment");
         fragmentTransaction.commitAllowingStateLoss();
     }
@@ -65,7 +66,7 @@ public class MainSearch extends AppCompatActivity {
                 Bundle bundle = new Bundle();
                 bundle.putString("text", text);
 
-
+                test2F= (BottomTwoFragment) childFragmentManager.findFragmentByTag("two");
                 if (test2F == null) {
                     test2F = new BottomTwoFragment();
                 }
@@ -78,6 +79,7 @@ public class MainSearch extends AppCompatActivity {
                 Fragment current1 = childFragmentManager.findFragmentById(R.id.frame);
                 System.out.println("current1 = " + current1);
                 //初始化A
+                test1F = (BottomOneFragment) childFragmentManager.findFragmentByTag("one");
                 if (test1F == null) {
                     test1F = new BottomOneFragment();
                 }
