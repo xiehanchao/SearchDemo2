@@ -65,7 +65,7 @@ public class MainSearch extends AppCompatActivity {
             } else {
                 Bundle bundle = new Bundle();
                 bundle.putString("text", text);
-
+                //初始化B
                 test2F= (BottomTwoFragment) childFragmentManager.findFragmentByTag("two");
                 if (test2F == null) {
                     test2F = new BottomTwoFragment();
@@ -77,7 +77,6 @@ public class MainSearch extends AppCompatActivity {
                 fragmentTransaction.hide(test2F);
 
                 Fragment current1 = childFragmentManager.findFragmentById(R.id.frame);
-                System.out.println("current1 = " + current1);
                 //初始化A
                 test1F = (BottomOneFragment) childFragmentManager.findFragmentByTag("one");
                 if (test1F == null) {

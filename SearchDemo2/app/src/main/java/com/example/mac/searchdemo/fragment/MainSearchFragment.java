@@ -1,5 +1,6 @@
 package com.example.mac.searchdemo.fragment;
 
+import android.content.Context;
 import android.content.res.Resources;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
@@ -21,6 +22,7 @@ import android.widget.RadioGroup;
 
 import com.example.mac.searchdemo.R;
 import com.example.mac.searchdemo.activity.MainSearch;
+import com.example.mac.searchdemo.utils.Utils;
 import com.example.mac.searchdemo.view.EditText_Clear;
 
 
@@ -51,6 +53,15 @@ public class MainSearchFragment extends Fragment {
     private int btn2Stats = 1;
     //文字是否改变了，如果文字改变了，切换btn1和btn2标签应该更新数据。
     private boolean isTextChange = false;
+    private Context context;
+    private AppBarLayout appbarlayout;
+    private CollapsingToolbarLayout collapsingToolbarLayout;
+
+    @Override
+    public void onAttach(Context context) {
+        this.context = context;
+        super.onAttach(context);
+    }
 
     @Nullable
     @Override
@@ -70,16 +81,13 @@ public class MainSearchFragment extends Fragment {
     public void onViewCreated(final View view, @Nullable final Bundle savedInstanceState) {
         System.out.println("MainSearchFragment.onViewCreated");
         final RadioGroup tab = (RadioGroup) view.findViewById(R.id.sliding_tabs1);
+        appbarlayout = (AppBarLayout) view.findViewById(R.id.appbarlayout);
+        collapsingToolbarLayout = (CollapsingToolbarLayout) appbarlayout.getChildAt(0);
         SearchHistory searchH = new SearchHistory();
         final MainSearch mainActivity = (MainSearch) getActivity();
         fragmentManager = getChildFragmentManager();
-        if (android.os.Build.VERSION.SDK_INT >= 21) {
-            down = getResources().getDrawable(R.drawable.down, getContext().getTheme());
-            up = getResources().getDrawable(R.drawable.up, getContext().getTheme());
-        } else {
-            down = getResources().getDrawable(R.drawable.down);
-            up = getResources().getDrawable(R.drawable.up);
-        }
+        down = Utils.getDownDrawable(this.context);
+        up = Utils.getUpDrawable(this.context);
         fragmentTransaction = fragmentManager.beginTransaction();
         fragmentTransaction.replace(R.id.frame, searchH);
         fragmentTransaction.commitAllowingStateLoss();
@@ -88,18 +96,14 @@ public class MainSearchFragment extends Fragment {
             @Override
             public void onClick(View v) {
                 currentFragment = 1;
-
                 FragmentManager childFragmentManager = getChildFragmentManager();
                 FragmentTransaction fragmentTransaction = childFragmentManager.beginTransaction();
                 BottomOneFragment one = (BottomOneFragment) childFragmentManager.findFragmentByTag("one");
                 BottomTwoFragment two = (BottomTwoFragment) childFragmentManager.findFragmentByTag("two");
-
                 if (isTextChange) {
                     one.setInputString(text);
                     isTextChange = false;
                 }
-
-                Fragment currentF = currentFragment();
                 //one是隐藏的，将其显示
                 if (one.isHidden()) {
                     fragmentTransaction.show(one);
@@ -108,7 +112,6 @@ public class MainSearchFragment extends Fragment {
                         fragmentTransaction.hide(two);
                     }
                 }
-
                 fragmentTransaction.commitAllowingStateLoss();
             }
         });
@@ -179,25 +182,16 @@ public class MainSearchFragment extends Fragment {
                         currentFragment = 1;
                         btn2Stats = 1;
                         btn1.setChecked(true);
-                        AppBarLayout appbarlayout = (AppBarLayout) view.findViewById(R.id.appbarlayout);
-                        CollapsingToolbarLayout collapsingToolbarLayout = (CollapsingToolbarLayout) appbarlayout.getChildAt(0);
                         AppBarLayout.LayoutParams mParams = (AppBarLayout.LayoutParams) collapsingToolbarLayout.getLayoutParams();
                         mParams.setScrollFlags(0);
                         collapsingToolbarLayout.setLayoutParams(mParams);
 
-                        if (android.os.Build.VERSION.SDK_INT >= 21) {
-                            up = getResources().getDrawable(R.drawable.up, getContext().getTheme());
-                        } else {
-                            up = getResources().getDrawable(R.drawable.up);
-                        }
+                        up = Utils.getUpDrawable(MainSearchFragment.this.context);
                         up.setBounds(0, 0, up.getMinimumWidth(), up.getMinimumHeight());
                         btn2.setCompoundDrawables(null, null, up, null);
                         tab.setVisibility(View.GONE);
                         mainActivity.jumpFragment(true, text, MainSearchFragment.this, 0, 0);
                     } else {
-
-                        AppBarLayout appbarlayout = (AppBarLayout) view.findViewById(R.id.appbarlayout);
-                        CollapsingToolbarLayout collapsingToolbarLayout = (CollapsingToolbarLayout) appbarlayout.getChildAt(0);
                         AppBarLayout.LayoutParams mParams = (AppBarLayout.LayoutParams) collapsingToolbarLayout.getLayoutParams();
                         mParams.setScrollFlags(AppBarLayout.LayoutParams.SCROLL_FLAG_SCROLL);
                         collapsingToolbarLayout.setLayoutParams(mParams);
@@ -214,7 +208,6 @@ public class MainSearchFragment extends Fragment {
     @Override
     public void onHiddenChanged(boolean hidden) {
         super.onHiddenChanged(hidden);
-
     }
 
     @Override

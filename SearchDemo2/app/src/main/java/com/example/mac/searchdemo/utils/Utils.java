@@ -1,5 +1,10 @@
 package com.example.mac.searchdemo.utils;
 
+import android.content.Context;
+import android.graphics.drawable.Drawable;
+
+import com.example.mac.searchdemo.R;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
@@ -47,4 +52,19 @@ public class Utils {
         return new ArrayList<String>();
     }
 
+    public static Drawable getUpDrawable(Context context) {
+        if (android.os.Build.VERSION.SDK_INT >= 21) {
+            return context.getResources().getDrawable(R.drawable.up, context.getTheme());
+        } else {
+            return context.getResources().getDrawable(R.drawable.up);
+        }
+    }
+
+    public static Drawable getDownDrawable(Context context) {
+        if (android.os.Build.VERSION.SDK_INT >= 21) {
+            return context.getResources().getDrawable(R.drawable.down, context.getTheme());
+        } else {
+            return context.getResources().getDrawable(R.drawable.down);
+        }
+    }
 }
